@@ -50,6 +50,13 @@ enum Actions
 	AllIn
 };
 
+enum PlayerPosition
+{
+	Dealer,
+	SmallBlind
+	BigBlind
+};
+
 class Card
 {
 public:
