@@ -1,0 +1,12 @@
+*.VC.db
+*.VC.opendb
+
+*.opensdf
+
+.vs/
+
+**/[Dd]ebug
+**/[Rr]elease
+**/[Bb]in/
+**/[Oo]bj/
+**/[Ll]og/
