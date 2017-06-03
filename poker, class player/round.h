@@ -13,7 +13,7 @@ public:
 	
 	void PrepareToPlay();
 	void CombinationsAndKickers();
-	void Play();
+	void Play(int);
 private:
 	friend class Game;
 	int m_pot;

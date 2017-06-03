@@ -6,7 +6,7 @@ void Game::PlayGame()
 	
 	Round r(players);
 
-	if (players.size() > 1 && players.size() <= 5)
-		r.Play();
+	/*if (players.size() > 1 && players.size() <= 5)
+		r.Play();*/
 	
 }
