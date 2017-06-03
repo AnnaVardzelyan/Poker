@@ -1,5 +1,5 @@
 #include "helper_functions.h"
-#include <fstream>
+#include "player.h"
 //+
 void makePokerHand(vector <Card> & deck, Card& card1, Card& card2)
 {
@@ -32,9 +32,8 @@ vector<Card> generateDeck()
 	return move(deck);
 }
 
-vector < pair < pair<Value, Value>, char >> PreflopHandsVector()
+void PreflopHandsVector(vector < pair < pair<Value, Value>, char >>& preflopHands)
 {
-	vector < pair < pair<Value, Value>, char >> preflopHands;
 	preflopHands.push_back(make_pair(make_pair(Ace, Ace), 'n'));
 	preflopHands.push_back(make_pair(make_pair(King, King), 'n'));
 	preflopHands.push_back(make_pair(make_pair(Queen, Queen), 'n'));
@@ -209,6 +208,4 @@ vector < pair < pair<Value, Value>, char >> PreflopHandsVector()
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(8), static_cast<Value>(2)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(7), static_cast<Value>(2)), 'o'));
 	// Check or Fold
-
-	return move(preflopHands);
 }

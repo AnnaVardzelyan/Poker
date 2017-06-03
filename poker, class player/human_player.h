@@ -9,9 +9,4 @@ public:
 		m_money = money;
 		m_playerType = playerType;
 	}
-
-	void Play() override
-	{
-		// Qt 
-	}
 };
