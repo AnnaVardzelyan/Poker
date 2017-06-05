@@ -17,7 +17,7 @@ ostream& operator <<(ostream& out, const Value& val)
 		out << "Ace";
 		break;
 	default:
-		out << val;
+		out << static_cast<int>(val);
 	}
 
 	return out;

@@ -1,9 +1,13 @@
 #include "helper_functions.h"
 #include "player.h"
+#include <ctime>
+#include <algorithm>
+using namespace std;
 //+
 void makePokerHand(vector <Card> & deck, Card& card1, Card& card2)
 {
-	random_shuffle(deck.begin(), deck.end());
+	srand(unsigned(time(0)));
+	random_shuffle(deck.begin(), deck.end(), [](int i) { return rand() % i; });
 	card1 = deck.back();
 	deck.pop_back();
 	card2 = deck.back();
@@ -13,7 +17,8 @@ void makePokerHand(vector <Card> & deck, Card& card1, Card& card2)
 //+
 void makeBoard(vector <Card> & deck, vector<Card> & board)
 {
-	random_shuffle(deck.begin(), deck.end());
+	srand(unsigned(time(0)));
+	random_shuffle(deck.begin(), deck.end(), [](int i) { return rand() % i; });
 	for (int i = 0; i < 5; ++i)
 	{
 		board.push_back(deck.back());
@@ -26,9 +31,8 @@ vector<Card> generateDeck()
 {
 	vector<Card> deck;
 	for (int i = 2; i <= Ace; ++i)
-		for (int j = 1; j <= Spades; ++j)
+		for (int j = 0; j <= Spades; ++j)
 			deck.push_back(Card(static_cast<Value>(i), static_cast<Color>(j)));
-
 	return move(deck);
 }
 

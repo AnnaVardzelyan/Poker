@@ -8,9 +8,12 @@ public:
 	Game()
 	{
 	}
-
+	~Game()
+	{
+		players.clear();
+	}
 	void PlayGame();
-	vector<Player> players;
+	vector<Player*> players;
 	int bigBlind;
 	int smallBlind;
 	int dealerIndex;

@@ -20,11 +20,15 @@ public:
 	}
 
 	HandCategories GetHandCategories() const;
+	virtual void Preflop(Actions&, int&, const vector<pair<Actions, int>>&, const PlayerPosition&, int) = 0 ;
+	virtual void Flop(Actions&, int&, int, const vector<Card>&, const vector<pair<Actions, int>>&) = 0;
+	virtual void Turn(Actions&, int&, int, const vector<Card>&, const vector<pair<Actions, int>>&) = 0;
+	virtual void River(Actions&, int&, int, const vector<Card>&, const vector<pair<Actions, int>>&) = 0;
 protected:
 	void Combination();
 	friend class Round;
 	friend class Game;
-	int m_money;
+	int m_money = 1000;
 	Card m_card1;
 	Card m_card2;
 	HandCategories m_handCategories = HighCard;
