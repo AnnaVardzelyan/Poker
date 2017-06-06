@@ -63,3 +63,4 @@ ostream& operator <<(ostream&, const Value&);
 ostream& operator <<(ostream&, const Color&);
 ostream& operator <<(ostream&, const Actions&);
 istream& operator >>(istream&, Actions&);
+ostream& operator <<(ostream&, HandCategories);

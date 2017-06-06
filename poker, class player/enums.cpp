@@ -65,8 +65,8 @@ ostream& operator <<(ostream& out, const Actions& act)
 	case Fold:
 		out << "Fold";
 		break;
-		return out;
 	}
+	return out;
 }
 
 istream& operator >> (istream& in, Actions& act)
@@ -88,4 +88,42 @@ istream& operator >> (istream& in, Actions& act)
 	else
 		act = static_cast<Actions>(-1);
 	return in;
+}
+
+ostream & operator<<(ostream & out, HandCategories hCat)
+{
+	switch (hCat)
+	{
+	case HighCard:
+		out << "High Card";
+		break;
+	case OnePair:
+		out << "One Pair";
+		break;
+	case TwoPair:
+		out << "Two Pair";
+		break;
+	case ThreeOfAKind:
+		out << "Three Of A Kind";
+		break;
+	case Straight:
+		out << "Straight!";
+		break;
+	case Flush:
+		out << "Flush!";
+		break;
+	case FullHouse:
+		out << "Full House!!";
+		break;
+	case FourOfAKind:
+		out << "Four Of A Kind!!";
+		break;
+	case StraightFlush:
+		out << "Straight Flush!!!";
+		break;
+	case RoyalFlush:
+		out << "*** Royal Flush ***";
+		break;
+	}
+	return out;
 }

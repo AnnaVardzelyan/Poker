@@ -4,7 +4,7 @@
 bool isOnePair(Card&, vector<Card> fullBoard);
 bool isTwoPair(Card&, Card&, vector<Card> fullBoard);
 bool isThreeOfAKind(Card&, vector<Card> fullBoard);
-bool isStraight(Card&, vector<Card> fullBoard);
+bool isStraight(Card&, vector<Card>& fullBoard);
 bool isFlush(Card&, vector<Card> fullBoard);
 bool isFullHouse(Card&, Card&, vector<Card> fullBoard);
 bool isFourOfAKind(Card&, vector<Card> fullBoard);

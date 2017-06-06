@@ -18,8 +18,9 @@ public:
 	}
 	void PrepareToPlay();
 	void CombinationsAndKickers();
-	void Play(int, int);
+	vector<Player*> Play(int, int);
 private:
+	void CompareHands();
 	friend class Game;
 	int m_pot;
 	int m_smallBlind;

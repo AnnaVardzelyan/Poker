@@ -64,15 +64,15 @@ bool isThreeOfAKind(Card & kicker, vector<Card> fullBoard)
 	return false;
 }
 
-bool isStraight(Card & kicker, vector<Card> fullBoard)
+bool isStraight(Card & kicker, vector<Card>& fullBoard)
 {
 	sort(fullBoard.begin(), fullBoard.end());
 
 	bool straight = true;
-	for (int i = fullBoard.size() - 1; i > combinationsSize; --i)
+	for (int i = fullBoard.size() - 1; i >= combinationsSize - 1; --i)
 	{
 		straight = true;
-		for (int j = i; j > i - combinationsSize; --j)
+		for (int j = i; j >= i - combinationsSize + 1; --j)
 		{
 			if (fullBoard[j - 1].value != fullBoard[j].value - 1)
 			{
@@ -81,7 +81,7 @@ bool isStraight(Card & kicker, vector<Card> fullBoard)
 			}
 		}
 
-		if (straight = true)
+		if (straight == true)
 		{
 			kicker = fullBoard[i];
 			break;
@@ -102,11 +102,10 @@ bool isStraight(Card & kicker, vector<Card> fullBoard)
 			}
 		}
 
+		kicker = fullBoard[combinationsSize - 1];
 		swap(fullBoard[0], fullBoard.back());
 		fullBoard.pop_back();
-		sort(fullBoard.begin(), fullBoard.end());
-
-		kicker = fullBoard[combinationsSize];
+		//sort(fullBoard.begin(), fullBoard.end());
 	}
 
 	return straight;
@@ -199,7 +198,7 @@ bool isStraightFlush(Card & kicker, vector<Card> fullBoard)
 	if (!straight)
 		return false;
 
-	sort(fullBoard.begin(), fullBoard.end());
+	//sort(fullBoard.begin(), fullBoard.end());
 	Card flushKicker(static_cast<Value>(1), Spades);
 
 	vector<Card> combination;
@@ -207,7 +206,7 @@ bool isStraightFlush(Card & kicker, vector<Card> fullBoard)
 	for (int i = 0; i < combinationsSize; ++i)
 		combination.push_back(*(it - i));
 
-	if (bool flush = isFlush(flushKicker, combination))
+	if (isFlush(flushKicker, combination))
 	{
 		kicker = straightKicker;
 		return true;
