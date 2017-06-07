@@ -72,7 +72,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 	m_pot += 2 * m_smallBlind;
 	m_pot += m_smallBlind;
 	
-	vector<int> foldedPlayersIndexes;
+
 	GameStages stage = Preflop;
 	int firstBetPos = (bigBlindPos + 1 >= m_players.size()) ? 0 : bigBlindPos + 1;
 	vector<pair<bool, int>> availableActs(AllIn + 1);
@@ -88,6 +88,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 			availableActs[Fold] = (make_pair(true, 0));
 			bool hasBeenRaised = false;
 			bool called = false;
+			bool allIn = false;
 			int amount = m_smallBlind;
 			while (true)
 			{
@@ -99,7 +100,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 					if (i == bigBlindPos && !hasBeenRaised)
 					{
 						availableActs[Check].first = true;
-						availableActs[Bet] = (make_pair(true, m_smallBlind * 2));
+						availableActs[Bet] = (make_pair(false, m_smallBlind * 2));
 					}
 					if (i == smallBlindPos || hasBeenRaised)
 					{
@@ -124,7 +125,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						cout << "Player " << i << " has Checked." << endl;
 						availableActs[Call].first = false;
 						availableActs[Raise].first = false;
-						availableActs[Bet].first = true;
+						availableActs[Bet].first = false;
 						availableActs[Check].first = true;
 						availableActs[AllIn].first = false;
 						called = true;
@@ -140,18 +141,17 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						}
 						else
 						{
-							// if 2 players are playing and one goes all in, then the 2nd one can't raise or bet
-							// if one of the players goes all in and others continue to raise, they have a different pot
 							cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 							m_pot += (m_players[i])->m_money;
 							(m_players[i])->m_money = 0;
+							allIn = true;
 						}
-						cout << (m_players[i])->m_money;
+						//cout << (m_players[i])->m_money;
 						hasBeenRaised = false;
 						called = true;
 						availableActs[Call].first = false;
 						availableActs[Raise].first = false;
-						availableActs[Bet].first = true;
+						availableActs[Bet].first = false;
 						availableActs[Check].first = true;
 						availableActs[AllIn].first = true;
 					}
@@ -195,17 +195,22 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 						m_pot += (m_players[i])->m_money;
 						availableActs[Call].second = (m_players[i])->m_money;
+						amount = (m_players[i])->m_money;
 						(m_players[i])->m_money = 0;
 						hasBeenRaised = true;
 						availableActs[Call].first = true;
 						availableActs[Raise].first = false;
 						availableActs[Bet].first = false;
 						availableActs[Check].first = false;
+						allIn = true;
 						break;
 					default:
 						break;
 					}
 				}
+				if (allIn)
+					return HasBeenAllIn();
+
 				if (called)
 					break;
 			}
@@ -217,10 +222,14 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 		case Flop:
 		{
 			availableActs[AllIn] = (make_pair(true, 0));
-			availableActs[Raise] = (make_pair(true, m_smallBlind * 2));
+			availableActs[Raise] = (make_pair(false, 0));
 			availableActs[Fold] = (make_pair(true, 0));
+			availableActs[Bet] = (make_pair(true, m_smallBlind * 2));
+			availableActs[Call] = (make_pair(false, 0));
 			bool hasBeenRaised = false;
+			bool bet = false;
 			bool called = false;
+			bool allIn = false;
 			int amount = m_smallBlind;
 			vector<Card> board = { m_board[0], m_board[1], m_board[2] };
 			while (true)
@@ -230,7 +239,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 					Actions act;
 					PlayerPosition ppos = Nothing;
 					(bigBlindPos == i) ? (ppos = BigBlind) : (ppos = SmallBlind);
-					if (!hasBeenRaised)
+					if (!hasBeenRaised && !bet)
 					{
 						availableActs[Check].first = true;
 						availableActs[Bet] = (make_pair(true, m_smallBlind * 2));
@@ -255,15 +264,17 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						return m_players;
 					}
 					case Check:
+					{
 						cout << "Player " << i << " has Checked." << endl;
 						availableActs[Call].first = false;
 						availableActs[Raise].first = false;
 						availableActs[Bet].first = true;
 						availableActs[Check].first = true;
-						availableActs[AllIn].first = false;
+						availableActs[AllIn].first = true;
 						called = true;
-						break;
-					case Call: // parenthesis to prevent errors with switch
+					}
+					break;
+					case Call:
 					{
 
 						if (availableActs[Call].second <= (m_players[i])->m_money)
@@ -274,14 +285,12 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						}
 						else
 						{
-							// if 2 players are playing and one goes all in, then the 2nd one can't raise or bet
-							// if one of the players goes all in and others continue to raise, they have a different pot
 							cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 							m_pot += (m_players[i])->m_money;
 							(m_players[i])->m_money = 0;
+							allIn = true;
 						}
-						cout << (m_players[i])->m_money;
-
+						//cout << (m_players[i])->m_money;
 						availableActs[Call].first = false;
 						availableActs[Raise].first = false;
 						availableActs[Bet].first = true;
@@ -291,6 +300,41 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						called = true;
 					}
 					break;
+					case Bet:
+					{
+						if ((m_players[i])->m_playerType == RealPlayer)
+						{
+							while (true)
+							{
+								cout << "Please, type in the amount of $ you want to Bet and press Enter. The amount cannot be smaller than "
+									<< availableActs[Bet].second << '.' << endl;
+								cin >> amount;
+								if (amount < availableActs[Bet].second)
+								{
+									cout << "You've tried to bet less than it is permitted. Try again." << endl;
+									continue;
+								}
+								if (amount + availableActs[Bet].second >(m_players[i])->m_money)
+								{
+									cout << "You don't have the sufficient funds to make this Bet. Try again.";
+									continue;
+								}
+								break;
+							}
+						}
+						cout << "Player " << i << " Bet " << amount << "." << endl;
+						availableActs[Raise].second += amount;
+						availableActs[Call].second = amount;
+						(m_players[i])->m_money -= availableActs[Raise].second;
+						m_pot += amount;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = true;
+						availableActs[AllIn].first = true;
+						bet = true;
+						break;
+					}
 					case Raise:
 					{
 						if ((m_players[i])->m_playerType == RealPlayer)
@@ -315,7 +359,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						}
 						cout << "Player " << i << " Raised the stakes for " << amount << "." << endl;
 						availableActs[Raise].second += amount;
-						availableActs[Call].second = amount; // -availableActs[Call].second;
+						availableActs[Call].second = amount;
 						(m_players[i])->m_money -= availableActs[Raise].second;
 						m_pot += amount;
 						hasBeenRaised = true;
@@ -327,20 +371,25 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 					}
 					break;
 					case AllIn:
+					{
 						cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 						m_pot += (m_players[i])->m_money;
 						availableActs[Call].second = (m_players[i])->m_money;
+						amount = (m_players[i])->m_money;
 						(m_players[i])->m_money = 0;
 						hasBeenRaised = true;
 						availableActs[Call].first = true;
 						availableActs[Raise].first = false;
 						availableActs[Bet].first = false;
 						availableActs[Check].first = false;
-						break;
-					default:
-						break;
+						allIn = true;
+					}
+					break;
 					}
 				}
+				if (allIn)
+					return HasBeenAllIn();
+
 				if (called)
 					break;
 			}
@@ -349,7 +398,6 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 			stage = Turn;
 			break;
 		}
-
 		case Turn:
 		{
 			availableActs[AllIn] = (make_pair(true, 0));
@@ -357,6 +405,8 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 			availableActs[Fold] = (make_pair(true, 0));
 			bool hasBeenRaised = false;
 			bool called = false;
+			bool allIn = false;
+			bool bet = false;
 			vector<Card> board = { m_board[0], m_board[1], m_board[2], m_board[3] };
 			while (true)
 			{
@@ -394,8 +444,14 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 					}
 					case Check:
 						cout << "Player " << i << " has Checked." << endl;
+						availableActs[Call].first = false;
+						availableActs[Raise].first = false;
+						availableActs[Bet].first = true;
+						availableActs[Check].first = true;
+						availableActs[AllIn].first = false;
+						called = true;
 						break;
-					case Call: // parenthesis to prevent errors with switch
+					case Call:
 					{
 
 						if (availableActs[Call].second <= (m_players[i])->m_money)
@@ -406,17 +462,56 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						}
 						else
 						{
-							// if 2 players are playing and one goes all in, then the 2nd one can't raise or bet
-							// if one of the players goes all in and others continue to raise, they have a different pot
 							cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 							m_pot += (m_players[i])->m_money;
 							(m_players[i])->m_money = 0;
+							allIn = true;
 						}
-						cout << (m_players[i])->m_money;
+						//cout << (m_players[i])->m_money;
+						availableActs[Call].first = false;
+						availableActs[Raise].first = false;
+						availableActs[Bet].first = true;
+						availableActs[Check].first = true;
+						availableActs[AllIn].first = true;
 						hasBeenRaised = false;
 						called = true;
 					}
 					break;
+					case Bet:
+					{
+						if ((m_players[i])->m_playerType == RealPlayer)
+						{
+							while (true)
+							{
+								cout << "Please, type in the amount of $ you want to Bet and press Enter. The amount cannot be smaller than "
+									<< availableActs[Bet].second << '.' << endl;
+								cin >> amount;
+								if (amount < availableActs[Bet].second)
+								{
+									cout << "You've tried to bet less than it is permitted. Try again." << endl;
+									continue;
+								}
+								if (amount + availableActs[Bet].second >(m_players[i])->m_money)
+								{
+									cout << "You don't have the sufficient funds to make this Bet. Try again.";
+									continue;
+								}
+								break;
+							}
+						}
+						cout << "Player " << i << " Bet " << amount << "." << endl;
+						availableActs[Raise].second += amount;
+						availableActs[Call].second = amount;
+						(m_players[i])->m_money -= availableActs[Raise].second;
+						m_pot += amount;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = true;
+						availableActs[AllIn].first = true;
+						bet = true;
+						break;
+					}
 					case Raise:
 					{
 						if ((m_players[i])->m_playerType == RealPlayer)
@@ -443,19 +538,34 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						(m_players[i])->m_money -= availableActs[Raise].second;
 						m_pot += amount;
 						hasBeenRaised = true;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = true;
+						availableActs[AllIn].first = true;
 					}
 					break;
 					case AllIn:
 						cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 						m_pot += (m_players[i])->m_money;
+						availableActs[Call].second = (m_players[i])->m_money;
+						amount = (m_players[i])->m_money;
 						(m_players[i])->m_money = 0;
 						hasBeenRaised = true;
 						availableActs[Call].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = false;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						allIn = true;
 						break;
 					default:
 						break;
 					}
 				}
+				if (allIn)
+					return HasBeenAllIn();
+
 				if (called)
 					break;
 			}
@@ -471,6 +581,8 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 			availableActs[Fold] = (make_pair(true, 0));
 			bool hasBeenRaised = false;
 			bool called = false;
+			bool allIn = false;
+			bool bet = false;
 			vector<Card> board = m_board;
 			while (true)
 			{
@@ -508,8 +620,14 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 					}
 					case Check:
 						cout << "Player " << i << " has Checked." << endl;
+						availableActs[Call].first = false;
+						availableActs[Raise].first = false;
+						availableActs[Bet].first = true;
+						availableActs[Check].first = true;
+						availableActs[AllIn].first = false;
+						called = true;
 						break;
-					case Call: // parenthesis to prevent errors with switch
+					case Call:
 					{
 
 						if (availableActs[Call].second <= (m_players[i])->m_money)
@@ -520,15 +638,54 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						}
 						else
 						{
-							// if 2 players are playing and one goes all in, then the 2nd one can't raise or bet
-							// if one of the players goes all in and others continue to raise, they have a different pot
 							cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 							m_pot += (m_players[i])->m_money;
 							(m_players[i])->m_money = 0;
+							allIn = true;
 						}
-						cout << (m_players[i])->m_money;
+						//cout << (m_players[i])->m_money;
+						availableActs[Call].first = false;
+						availableActs[Raise].first = false;
+						availableActs[Bet].first = true;
+						availableActs[Check].first = true;
+						availableActs[AllIn].first = true;
 						hasBeenRaised = false;
 						called = true;
+					}
+					break;
+					case Bet:
+					{
+						if ((m_players[i])->m_playerType == RealPlayer)
+						{
+							while (true)
+							{
+								cout << "Please, type in the amount of $ you want to Bet and press Enter. The amount cannot be smaller than "
+									<< availableActs[Bet].second << '.' << endl;
+								cin >> amount;
+								if (amount < availableActs[Bet].second)
+								{
+									cout << "You've tried to bet less than it is permitted. Try again." << endl;
+									continue;
+								}
+								if (amount + availableActs[Bet].second >(m_players[i])->m_money)
+								{
+									cout << "You don't have the sufficient funds to make this Bet. Try again.";
+									continue;
+								}
+								break;
+							}
+						}
+						cout << "Player " << i << " Bet " << amount << "." << endl;
+						availableActs[Raise].second += amount;
+						availableActs[Call].second = amount;
+						(m_players[i])->m_money -= availableActs[Raise].second;
+						m_pot += amount;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = true;
+						availableActs[AllIn].first = true;
+						bet = true;
 					}
 					break;
 					case Raise:
@@ -557,25 +714,41 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 						(m_players[i])->m_money -= availableActs[Raise].second;
 						m_pot += amount;
 						hasBeenRaised = true;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = true;
+						availableActs[AllIn].first = true;
 					}
 					break;
 					case AllIn:
+					{
 						cout << "Player " << i << " has gone All in for" << (m_players[i])->m_money << " $." << endl;
 						m_pot += (m_players[i])->m_money;
+						availableActs[Call].second = (m_players[i])->m_money;
+						amount = (m_players[i])->m_money;
 						(m_players[i])->m_money = 0;
 						hasBeenRaised = true;
-						availableActs[Call].first = false;
-						break;
-					default:
+						availableActs[AllIn].first = false;
+						availableActs[Call].first = true;
+						availableActs[Raise].first = false;
+						availableActs[Bet].first = false;
+						availableActs[Check].first = false;
+						allIn = true;
+					}
 						break;
 					}
 				}
+				if (allIn)
+					return HasBeenAllIn();
+
 				if (called)
 					break;
 			}
 
 			cout << endl << endl;
 			CompareHands();
+			cout << endl << endl;
 			return m_players;
 		}
 		}
@@ -584,37 +757,7 @@ vector<Player*> Round::Play(int smallBlindPos, int bigBlindPos)
 
 void Round::CompareHands()
 {
-	HandCategories myComb = HighCard;
-	vector<Card> fullHand = m_board;
-	for (int i = 0; i < m_players.size(); ++i)
-	{
-		fullHand.push_back(m_players[i]->m_card1);
-		fullHand.push_back(m_players[i]->m_card2);
-
-		if (isRoyalFlush(fullHand))
-			myComb = RoyalFlush;
-		else if (isStraightFlush(*(m_players[i]->m_kicker1), fullHand))
-			myComb = StraightFlush;
-		else if (isFourOfAKind(*(m_players[i]->m_kicker1), fullHand))
-			myComb = FourOfAKind;
-		else if (isFullHouse(*(m_players[i]->m_kicker1), *(m_players[i]->m_kicker2), fullHand))
-			myComb = FullHouse;
-		else if (isFlush(*(m_players[i]->m_kicker1), fullHand))
-			myComb = Flush;
-		else if (isStraight(*(m_players[i]->m_kicker1), fullHand))
-			myComb = Straight;
-		else if (isThreeOfAKind(*(m_players[i]->m_kicker1), fullHand))
-			myComb = ThreeOfAKind;
-		else if (isTwoPair(*(m_players[i]->m_kicker1), *(m_players[i]->m_kicker2), fullHand))
-			myComb = TwoPair;
-		else if (isOnePair(*(m_players[i]->m_kicker1), fullHand))
-			myComb = OnePair;
-
-		m_players[i]->m_handCategories = myComb;
-		fullHand.erase(find(fullHand.begin(), fullHand.end(), m_players[i]->m_card1));
-		fullHand.erase(find(fullHand.begin(), fullHand.end(), m_players[i]->m_card2));
-	}
-
+	CombinationsAndKickers();
 
 	if (m_players[0]->m_handCategories > m_players[1]->m_handCategories)
 	{
@@ -670,7 +813,7 @@ void Round::CompareHands()
 			m_players[0]->m_money += m_pot;
 			return;
 		}
-
+		
 		cout << "Draw. Both players win " << m_pot / 2 << '.';
 		m_players[0]->m_money += m_pot/2;
 		m_players[1]->m_money += m_pot/2;
@@ -680,4 +823,15 @@ void Round::CompareHands()
 	cout << "Player " << 0 << " wins " << m_pot << " with " << m_players[0]->m_handCategories << " and kicker " << *(m_players[0]->m_kicker1) << endl;
 	m_players[0]->m_money += m_pot;
 	return;
+}
+
+vector<Player*> Round::HasBeenAllIn()
+{
+	cout << "The cards on the board are:" << endl;
+	for (int i = 0; i < m_board.size(); ++i)
+		cout << m_board[i] << endl;
+
+	CompareHands();
+	cout << endl << endl;
+	return m_players;
 }

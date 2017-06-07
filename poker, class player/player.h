@@ -9,9 +9,7 @@ using namespace std;
 static const int suits = 4;
 static const int combinationsSize = 5;
 
-
 class Game;
-
 class Player
 {
 public:
@@ -25,7 +23,7 @@ public:
 	virtual void Turn(Actions&, int&, int, const vector<Card>&, const vector<pair<bool, int>>&) = 0;
 	virtual void River(Actions&, int&, int, const vector<Card>&, const vector<pair<bool, int>>&) = 0;
 protected:
-	void Combination();
+	//void Combination();
 	friend class Round;
 	friend class Game;
 	int m_money = 1000;

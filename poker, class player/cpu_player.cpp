@@ -131,11 +131,11 @@ void CPUPlayer::Preflop(Actions& action, int& amount, const vector<pair<bool, in
 		}
 		action = Fold;
 	}
-	else if (handValue < 100)
+	else if (handValue < 150)
 	{
 		if (availableActions[Call].first)
 			{
-				if (handValue < 80)
+				if (handValue < 120)
 				{
 					if ((availableActions[Call].second * 8) <= m_money)
 					{

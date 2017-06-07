@@ -11,10 +11,7 @@ int main()
 	(g.players).push_back(pl1);
 	(g.players).push_back(pl2);
 	g.PlayGame();
-	(g.players).pop_back();
-	(g.players).pop_back();
+	(g.players).clear();
 	delete pl1;
 	delete pl2;
-	// cpu - Raise = vector iterator not deferencable or some shit like that
-	
 }

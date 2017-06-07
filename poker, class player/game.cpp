@@ -17,7 +17,10 @@ void Game::PlayGame()
 		{
 			if (players[i]->m_money < bigBlind)
 			{
-				players.erase(players.begin() + i);
+				swap(players[i], players.back());
+				players.pop_back();
+				cout << "The Player " << i << " doesn't have enough funds to continue. The Game is over" << endl;
+				return;
 			}
 		}
 

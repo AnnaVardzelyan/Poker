@@ -7,6 +7,8 @@ class Game
 public:
 	Game()
 	{
+		bigBlind = 20;
+		smallBlind = 10;
 	}
 	~Game()
 	{
@@ -16,6 +18,5 @@ public:
 	vector<Player*> players;
 	int bigBlind;
 	int smallBlind;
-	int dealerIndex;
 	int pot;
 };

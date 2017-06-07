@@ -21,6 +21,7 @@ public:
 	vector<Player*> Play(int, int);
 private:
 	void CompareHands();
+	vector<Player*> HasBeenAllIn();
 	friend class Game;
 	int m_pot;
 	int m_smallBlind;

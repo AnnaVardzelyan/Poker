@@ -3,7 +3,6 @@
 #include <ctime>
 #include <algorithm>
 using namespace std;
-//+
 void makePokerHand(vector <Card> & deck, Card& card1, Card& card2)
 {
 	srand(unsigned(time(0)));
@@ -14,7 +13,6 @@ void makePokerHand(vector <Card> & deck, Card& card1, Card& card2)
 	deck.pop_back();
 }
 
-//+
 void makeBoard(vector <Card> & deck, vector<Card> & board)
 {
 	srand(unsigned(time(0)));
@@ -26,7 +24,6 @@ void makeBoard(vector <Card> & deck, vector<Card> & board)
 	}
 }
 
-//+
 vector<Card> generateDeck()
 {
 	vector<Card> deck;
@@ -140,8 +137,6 @@ void PreflopHandsVector(vector < pair < pair<Value, Value>, char >>& preflopHand
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(10), static_cast<Value>(2)), 's'));
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(9), static_cast<Value>(8)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(10), static_cast<Value>(8)), 'o'));
-	// Call
-
 	preflopHands.push_back(make_pair(make_pair(Ace, static_cast<Value>(5)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(Ace, static_cast<Value>(7)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(7), static_cast<Value>(3)), 's'));
@@ -188,6 +183,8 @@ void PreflopHandsVector(vector < pair < pair<Value, Value>, char >>& preflopHand
 	preflopHands.push_back(make_pair(make_pair(Queen, static_cast<Value>(3)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(7), static_cast<Value>(4)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(Queen, static_cast<Value>(2)), 'o'));
+	// Call
+
 	preflopHands.push_back(make_pair(make_pair(Jack, static_cast<Value>(6)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(static_cast<Value>(6), static_cast<Value>(3)), 'o'));
 	preflopHands.push_back(make_pair(make_pair(Jack, static_cast<Value>(5)), 'o'));
